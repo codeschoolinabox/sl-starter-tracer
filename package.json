@@ -1,7 +1,7 @@
 {
-  "name": "@study-lenses/CHANGEME",
-  "version": "0.1.0",
-  "description": "CHANGEME",
+  "name": "@study-lenses/trace-js-klve",
+  "version": "0.1.1",
+  "description": "JavaScript execution tracer for @study-lenses — traces JS code via Babel instrumentation",
   "type": "module",
   "exports": {
     ".": {
@@ -31,18 +31,25 @@
     "LICENSE",
     "package.json"
   ],
-  "dependencies": {
-    "@study-lenses/tracing": "^0.1.1"
-  },
   "engines": {
     "node": ">=22.0.0"
   },
-  "keywords": [],
+  "keywords": [
+    "study-lenses",
+    "tracing",
+    "javascript",
+    "babel",
+    "education"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/OWNER/REPO"
+    "url": "https://github.com/codeschoolinabox/sl-trace-js-klve"
   },
-  "author": "",
+  "author": "Evan Cole",
+  "dependencies": {
+    "@babel/standalone": "^7.26.0",
+    "@study-lenses/tracing": "^0.1.0"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public",
