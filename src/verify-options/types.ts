@@ -1,10 +1,10 @@
 /**
  * @file Local types for verify-options.
+ *
+ * TODO: Add types for your verifyOptions constraints here.
  * Keep these local — avoids cross-boundary import from record/.
+ * If verifyOptions has no custom types, delete this file.
  */
 
-/** Fields validated by the mutual-exclusion constraint. */
-export type NameFilter = {
-  readonly include?: readonly string[];
-  readonly exclude?: readonly string[];
-};
+/** Placeholder constraint type. Replace with your actual constraint types. */
+export type OptionsConstraints = Record<string, unknown>;

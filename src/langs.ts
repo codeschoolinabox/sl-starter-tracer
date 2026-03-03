@@ -1,8 +1,8 @@
 /**
- * @file Supported file extensions for the js-klve tracer.
+ * @file Supported file extensions for this tracer (without leading dot).
  *
- * The tracer accepts `.js`, `.mjs`, and `.cjs` files.
- * Frozen in `index.ts` alongside other static data.
+ * TODO: Replace with the extensions your tracer handles.
+ * Examples: ['py'] for Python, ['js', 'mjs', 'cjs'] for JavaScript.
  */
 
-export default ['js', 'mjs', 'cjs'];
+export default ['FIXME'];

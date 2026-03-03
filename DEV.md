@@ -17,75 +17,7 @@ Internal architecture, conventions, and implementation details for contributors.
 
 ## Architecture Overview
 
-The ★ items are what you implement. Everything else is handled by the `@study-lenses/tracing` wrapper — config validation, freezing, steps conformity checks, and error handling. See the README for a higher-level overview.
-
-### Pipeline
-
-```mermaid
-flowchart TB
-    consumer1["<b>CONSUMER PROGRAM</b><br/>(educational tool)<br/><br/>calls trace(tracer, code, config?)"]
-
-    consumer1 -- "source code + partial config" --> prepareMeta
-
-    subgraph wrapper ["@study-lenses/tracing — API WRAPPER"]
-        direction TB
-
-        subgraph validation ["VALIDATION (sync)"]
-            direction TB
-            prepareMeta["<b>Prepare meta config</b><br/>expand shorthand, fill defaults,<br/>validate against wrapper schema"]
-            prepareOpts["<b>Prepare tracer options</b><br/>expand shorthand, fill defaults,<br/>validate against tracer schema<br/>(skipped if no optionsSchema)"]
-            freezeConfig["<b>Freeze config</b><br/>deep-freeze resolved<br/>meta + options"]
-            verifyOpts["<b>Verify options semantics</b><br/>cross-field constraints<br/>(skipped if no verifyOptions)"]
-
-            prepareMeta --> prepareOpts --> freezeConfig --> verifyOpts
-        end
-
-        subgraph execution ["EXECUTION (async)"]
-            direction TB
-            executeTracer["<b>Execute tracer</b><br/>call record() with code +<br/>fully resolved frozen config"]
-        end
-
-        subgraph postprocessing ["POST-PROCESSING (sync)"]
-            direction TB
-            validateSteps["<b>Validate steps</b><br/>array of POJOs, 1-indexed step,<br/>valid source locations"]
-            freezeOutput["<b>Freeze output</b><br/>deep-freeze steps for<br/>immutable consumer access"]
-
-            validateSteps --> freezeOutput
-        end
-
-        verifyOpts -- "code + frozen config" --> executeTracer
-        executeTracer -- "raw steps" --> validateSteps
-    end
-
-    freezeOutput -- "frozen steps" --> consumer2
-    consumer2["<b>CONSUMER PROGRAM</b><br/>(receives frozen steps)"]
-
-    subgraph tracermod ["YOUR TRACER MODULE  ★ = you implement this"]
-        direction TB
-        tid["<b>★ id</b>  (required)<br/>unique identifier; used for<br/>cache invalidation"]
-        tlangs["<b>★ langs</b>  (required)<br/>supported file extensions"]
-        tschema["<b>★ optionsSchema</b>  (optional)<br/>JSON Schema for tracer options"]
-        tverify["<b>★ verifyOptions</b>  (optional)<br/>cross-field semantic checks"]
-        trecord["<b>★ record</b>  (required)<br/>instruments + executes code,<br/>returns execution steps"]
-
-        tid ~~~ tlangs
-        tlangs ~~~ tschema
-        tschema ~~~ tverify
-        tverify ~~~ trecord
-    end
-
-    tschema -. "uses schema" .-> prepareOpts
-    tverify -. "calls verify" .-> verifyOpts
-    trecord -. "calls record" .-> executeTracer
-
-    style wrapper fill:none,stroke:#333,stroke-width:3px
-    style validation fill:none,stroke:#666,stroke-dasharray:5 5
-    style execution fill:none,stroke:#666,stroke-dasharray:5 5
-    style postprocessing fill:none,stroke:#666,stroke-dasharray:5 5
-    style tracermod fill:#fff8e1,stroke:#f9a825,stroke-width:2px
-    style consumer1 fill:#e3f2fd,stroke:#1565c0
-    style consumer2 fill:#e3f2fd,stroke:#1565c0
-```
+> See [DOCS.md](./DOCS.md) for the full pipeline diagram.
 
 ## Codebase Conventions
 
@@ -515,9 +447,6 @@ function isPlainObject(thing: unknown): thing is Record<string, unknown> {
 }
 ```
 
-Real examples: `src/utils/is-plain-object.ts`, `src/api/trace.ts` (lines 33–58 guard
-then line 76 executes).
-
 #### Named intermediate variables
 
 When a sub-expression has a clear identity, capture it in a `const`. Name the thing, then
@@ -535,8 +464,6 @@ if (!tracers[tracer]) throw new TracerUnknownError(tracer, ...);
 const options = tracers[tracer].optionsSchema ? prepareConfig(...) : {};
 ```
 
-Real example: `src/api/trace.ts` lines 39–40.
-
 #### Ternary: transparent value selection only
 
 OK when both branches compute "the same kind of thing" — a variable name can capture the
@@ -550,8 +477,6 @@ const entry = condition ? [key, expandBoolean(value, schema)] : [key, value];
 // ❌ — branches do different things; ternary hides the divergence
 const result = condition ? executeSomething() : returnEarlyWithFallback();
 ```
-
-Real example: `src/configuring/expand-shorthand.ts` `.map()` callback.
 
 #### Within-file helpers for readability; separate file for reuse
 
@@ -597,8 +522,6 @@ function createClosure(state) {
 }
 ```
 
-Real examples: `src/configuring/expand-shorthand.ts`, `src/api/embody.ts`.
-
 #### Numbered step comments for multi-phase functions
 
 When a function has distinct phases that aren't self-evident from the code, number them.
@@ -619,8 +542,6 @@ const meta = prepareConfig(...);
 // 4. Record (async) — returns steps directly
 return tracerModule.record(code, { meta, options });
 ```
-
-Real example: `src/api/trace.ts` (8 numbered steps).
 
 #### WHY comments for non-obvious JS semantics
 

@@ -15,11 +15,6 @@ export default tseslint.config(
       'node_modules/',
       '**/*.d.ts',
       'docs/', // TypeDoc-generated, not linted
-      // Pre-existing tracer internals from external developer — not owned by this package
-      'src/record/trace.ts',
-      'src/record/filter-steps.ts',
-      'src/record/ast-map.ts',
-      'src/record/types.ts',
     ],
   },
 

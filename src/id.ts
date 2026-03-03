@@ -1,10 +1,11 @@
 /**
- * @file Tracer identifier for js-klve.
+ * @file Tracer identifier.
  *
- * Used as a cache-invalidation key by the API layer. Bump this value
- * whenever the options schema changes incompatibly (rare).
+ * TODO: Set your tracer's unique identifier.
+ * Convention: '<language>:<engine>' — e.g. 'py:pyodide', 'js:acorn', 'wasm:wabt'
+ * Change when options shape changes incompatibly (invalidates consumer caches).
  */
 
-const id = 'js:klve';
+const id = 'FIXME:<lang>:<engine>';
 
 export default id;

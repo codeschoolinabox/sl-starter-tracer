@@ -1,5 +1,5 @@
 /**
- * @file Package entry point for @study-lenses/trace-js-klve.
+ * @file Package entry point for the tracer module.
  *
  * Assembles the TracerModule from static data and the record function,
  * wires it into @study-lenses/tracing, and re-exports the resulting

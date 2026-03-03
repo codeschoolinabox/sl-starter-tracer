@@ -1,54 +1,37 @@
 # record/
 
-JavaScript tracer core. Exposes one function: `record(code, config)`.
+Tracer core. Exposes one function: `record(code, config)`.
 
 ## What this directory contains
 
 ```
 record/
-  index.ts          ← Public interface. The RecordFunction adapter. Edit this.
-  tracer.ts         ← Babel instrumentation engine. External code — do not edit.
-  filter-steps.ts   ← Step filtering logic. External code — do not edit.
-  ast-map.ts        ← AST node-type → filter key mapping. External code — do not edit.
-  types.ts          ← Internal types (RawStep, etc.). External code — do not edit.
-  babel-standalone.d.ts ← Type declarations for @babel/standalone. Do not edit.
+  index.ts          ← Entry point. Re-exports record.ts (add env detection here if needed).
+  record.ts         ← RecordFunction stub. TODO: implement your tracer here.
+  types.ts          ← Internal types (RawStep, TracerOptions). TODO: replace placeholders.
   tests/
-    record.test.ts
-    filter-steps.test.ts
+    record.test.ts         ← Integration tests for record(). TODO: add your tests.
 ```
 
-## External Code
+## Your Implementation
 
-`tracer.ts`, `filter-steps.ts`, `ast-map.ts`, and `types.ts` are pre-existing code by
-**Kelley van Evert** ([jsviz.klve.nl](https://jsviz.klve.nl)). They are not owned by
-this package.
+`record.ts` is where your tracer engine goes. It receives:
 
-These files are excluded from linting (ESLint global ignores) and TypeScript strict
-checking (`// @ts-nocheck` on `tracer.ts`). Do not modify them — they are the
-tracer engine, not our code.
+- `code` — the source code string to trace
+- `config.meta` — frozen execution limits (`maxSteps`, `maxTime`, etc.)
+- `config.options` — frozen tracer options (validated against your schema)
 
-If you need to change how the tracer behaves, do it in `index.ts` by pre/post-processing
-the steps, or open an issue upstream.
+It must return a `Promise<readonly StepCore[]>` and throw `ParseError`, `RuntimeError`,
+or `LimitExceededError` on failure. See `@study-lenses/tracing` for the full contract.
 
 ## The Pipeline
 
 ```
-record(code, { meta, options })
-  └─ trace(code, { maxSteps, maxTime })   ← tracer.ts (Babel instrumentation + execution)
-       └─ filterSteps(rawSteps, filter)   ← filter-steps.ts (post-execution filter)
-            └─ renumber steps (1-indexed) ← index.ts
+record(code, { meta, options })        ← record/index.ts (entry, env detection if needed)
+  └─ your engine call                  ← record/record.ts (your implementation)
+       └─ adapt to StepCore shape
+            └─ renumber steps (1-indexed if needed)
 ```
-
-1. **`tracer.ts`** — Instruments code with Babel, executes it in a sandboxed function,
-   collects one step per AST node event (before/after). Enforces `maxSteps` and
-   `maxTime` limits.
-2. **`filter-steps.ts`** — Applies post-trace filtering from `options`: removes excluded
-   AST node types (top-level toggles like `loops`, `declarations`), name-filtered steps
-   (`options.filter.names`), timing-filtered steps (`options.filter.timing`), and strips
-   data fields (`options.filter.data`).
-3. **`index.ts`** — Adapter: converts tracer errors to `@study-lenses/tracing` error
-   classes (`ParseError`, `RuntimeError`, `LimitExceededError`), renumbers steps to
-   1-indexed, satisfies the `RecordFunction` contract.
 
 ## What `index.ts` exposes
 
@@ -56,9 +39,10 @@ record(code, { meta, options })
 `@study-lenses/tracing`. Called by the tracing wrappers after schema validation and
 options verification.
 
+If your engine needs environment detection (e.g. browser vs. Node, Pyodide vs. CPython),
+add that logic in `index.ts` rather than `record.ts`.
+
 ## Tests
 
 - `record.test.ts` — integration tests through `record()`: real code strings, checks
-  step structure, filter behaviour, error propagation
-- `filter-steps.test.ts` — unit tests for `filterSteps()` directly: node type filters,
-  name filters, timing filters, data field stripping
+  step structure, error propagation

@@ -1,7 +1,7 @@
 {
-  "name": "@study-lenses/trace-js-klve",
-  "version": "0.1.1",
-  "description": "JavaScript execution tracer for @study-lenses — traces JS code via Babel instrumentation",
+  "name": "@study-lenses/trace-<lang>-<engine>",
+  "version": "0.1.0",
+  "description": "TODO: Tracer for @study-lenses/tracing. Replace with your package description.",
   "type": "module",
   "exports": {
     ".": {
@@ -37,17 +37,14 @@
   "keywords": [
     "study-lenses",
     "tracing",
-    "javascript",
-    "babel",
     "education"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/codeschoolinabox/sl-trace-js-klve"
+    "url": "https://github.com/codeschoolinabox/sl-starter-tracer"
   },
   "author": "Evan Cole",
   "dependencies": {
-    "@babel/standalone": "^7.26.0",
     "@study-lenses/tracing": "^0.1.0"
   },
   "license": "MIT",
