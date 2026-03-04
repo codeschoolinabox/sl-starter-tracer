@@ -16,4 +16,7 @@ describe('record', () => {
   it.todo('throws ParseError on syntax error');
   it.todo('throws RuntimeError on runtime error');
   it.todo('throws LimitExceededError when step limit exceeded');
+  it.todo('throws LimitExceededError when iteration limit exceeded');
+  it.todo('throws LimitExceededError when recursion limit exceeded');
+  it.todo('throws LimitExceededError when time limit exceeded');
 });
